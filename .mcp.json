@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "opencraft": {
+      "title": "OpenCraft",
+      "description": "Safety-first Minecraft server administration through Exaroton.",
+      "icons": [
+        {
+          "src": "./assets/icon.svg",
+          "mimeType": "image/svg+xml",
+          "sizes": ["512x512"]
+        }
+      ],
+      "cwd": ".",
+      "command": "node",
+      "args": ["./dist/server.js"],
+      "env_vars": [
+        "EXAROTON_API_TOKEN",
+        "EXAROTON_SERVER_ID",
+        "OPENCRAFT_CONFIG_PATH",
+        "OPENCRAFT_SAFETY_MODE"
+      ]
+    }
+  }
+}

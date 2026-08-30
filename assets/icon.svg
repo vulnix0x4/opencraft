@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">OpenCraft icon</title>
+  <desc id="desc">A pixel-inspired emerald command prompt in a dark rounded square.</desc>
+  <rect width="512" height="512" rx="112" fill="#101512"/>
+  <rect x="28" y="28" width="456" height="456" rx="88" fill="none" stroke="#26372C" stroke-width="16"/>
+  <path d="M139 151h58v52h55v53h-55v53h-58l72-79-72-79Z" fill="#69F0AE"/>
+  <path d="M249 309h135v52H249z" fill="#E8FFF1"/>
+  <path d="M316 151h68v68h-68z" fill="#69F0AE" opacity=".28"/>
+  <path d="M336 171h28v28h-28z" fill="#69F0AE"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 320" role="img" aria-labelledby="title desc">
+  <title id="title">OpenCraft</title>
+  <desc id="desc">OpenCraft dark wordmark with emerald command prompt symbol.</desc>
+  <rect width="1100" height="320" rx="64" fill="#101512"/>
+  <rect x="48" y="48" width="224" height="224" rx="52" fill="#17231B" stroke="#2E4937" stroke-width="8"/>
+  <path d="M94 102h35v32h34v32h-34v32H94l44-48-44-48Z" fill="#69F0AE"/>
+  <path d="M158 198h68v32h-68z" fill="#E8FFF1"/>
+  <text x="320" y="188" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="112" font-weight="750" fill="#F2FFF6" letter-spacing="-8">OpenCraft</text>
+  <text x="326" y="237" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="600" fill="#88A892" letter-spacing="2">MINECRAFT SERVER COPILOT</text>
+</svg>

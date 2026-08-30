@@ -1,0 +1,46 @@
+{
+  "name": "opencraft",
+  "version": "0.1.0",
+  "description": "A safety-first AI Minecraft server admin for Exaroton.",
+  "type": "module",
+  "private": true,
+  "homepage": "https://github.com/vulnix0x4/opencraft#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vulnix0x4/opencraft.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vulnix0x4/opencraft/issues"
+  },
+  "bin": {
+    "opencraft": "./bin/opencraft.mjs"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "setup": "tsx src/cli.ts setup",
+    "connect": "tsx src/cli.ts connect",
+    "doctor": "tsx src/cli.ts doctor",
+    "mcp": "tsx src/server.ts",
+    "test": "vitest run && npm run build && node scripts/smoke.mjs",
+    "test:mcp": "npm run build && node scripts/smoke.mjs",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.8.4",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "picocolors": "^1.1.1",
+    "strip-ansi": "^7.1.2",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

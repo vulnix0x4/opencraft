@@ -1,0 +1,4 @@
+interface:
+  display_name: "Minecraft Server Admin"
+  short_description: "Safely operate and diagnose an Exaroton Minecraft server"
+  default_prompt: "Check my Minecraft server health and explain anything unusual."

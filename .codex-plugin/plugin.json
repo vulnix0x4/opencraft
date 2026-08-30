@@ -1,0 +1,29 @@
+{
+  "name": "opencraft",
+  "version": "0.1.0",
+  "description": "A safety-first AI server admin for Minecraft, powered by Exaroton.",
+  "author": {
+    "name": "Vulnix"
+  },
+  "license": "MIT",
+  "keywords": ["minecraft", "exaroton", "server-admin", "mcp", "codex"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "OpenCraft",
+    "shortDescription": "Operate and diagnose Minecraft servers safely.",
+    "longDescription": "Ask your AI who is online, inspect logs, diagnose crashes, manage players, update configuration, and perform guarded server actions through the Exaroton API.",
+    "developerName": "Vulnix",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "brandColor": "#69F0AE",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.svg",
+    "logoDark": "./assets/logo-dark.svg",
+    "defaultPrompt": [
+      "Check my Minecraft server health and explain anything unusual.",
+      "Read the latest logs and diagnose the most likely problem.",
+      "Who is online right now?"
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
