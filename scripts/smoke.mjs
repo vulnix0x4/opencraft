@@ -17,12 +17,40 @@ const transport = new StdioClientTransport({
   stderr: "pipe"
 });
 const client = new Client({ name: "opencraft-smoke", version: "0.1.0" });
+const expectedTools = [
+  "minecraft_diagnose",
+  "minecraft_file_info",
+  "minecraft_get_player_list",
+  "minecraft_get_players",
+  "minecraft_give_item",
+  "minecraft_list_player_lists",
+  "minecraft_read_config",
+  "minecraft_read_file",
+  "minecraft_read_logs",
+  "minecraft_restart_server",
+  "minecraft_run_command",
+  "minecraft_send_message",
+  "minecraft_server_status",
+  "minecraft_set_gamemode",
+  "minecraft_set_gamerule",
+  "minecraft_set_motd",
+  "minecraft_set_time",
+  "minecraft_set_weather",
+  "minecraft_start_server",
+  "minecraft_stop_server",
+  "minecraft_teleport",
+  "minecraft_update_config",
+  "minecraft_update_player_list",
+  "opencraft_connect",
+  "opencraft_setup_status"
+].sort();
 
 try {
   await client.connect(transport);
   const result = await client.listTools();
-  if (result.tools.length < 15) {
-    throw new Error(`Expected at least 15 tools, received ${result.tools.length}.`);
+  const actualTools = result.tools.map((tool) => tool.name).sort();
+  if (JSON.stringify(actualTools) !== JSON.stringify(expectedTools)) {
+    throw new Error(`MCP tool mismatch. Expected ${expectedTools.join(", ")}; received ${actualTools.join(", ")}.`);
   }
   const setup = await client.callTool({ name: "opencraft_setup_status", arguments: {} });
   if (!setup.isError) throw new Error("An unconfigured smoke test should return the safe setup instruction.");

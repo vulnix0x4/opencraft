@@ -41,9 +41,39 @@ function errorResult(error: unknown) {
   return { content: [{ type: "text" as const, text: message }], isError: true as const };
 }
 
-async function runtime() {
+async function defaultRuntime() {
   const config = await loadConfig();
   return { config, client: new ExarotonClient(config.apiToken), serverId: config.serverId };
+}
+
+export type OpenCraftApiClient = Pick<ExarotonClient,
+  | "getServer"
+  | "getLogs"
+  | "getRam"
+  | "setMotd"
+  | "start"
+  | "stop"
+  | "restart"
+  | "runCommand"
+  | "listPlayerLists"
+  | "getPlayerList"
+  | "addPlayerListEntries"
+  | "removePlayerListEntries"
+  | "getFileInfo"
+  | "readFile"
+  | "getConfig"
+  | "updateConfig"
+>;
+
+export interface OpenCraftRuntime {
+  config: Awaited<ReturnType<typeof loadConfig>>;
+  client: OpenCraftApiClient;
+  serverId: string;
+}
+
+export interface OpenCraftServerDependencies {
+  runtime?: () => Promise<OpenCraftRuntime>;
+  connect?: typeof connectOpenCraft;
 }
 
 function confirmedActionSchema() {
@@ -52,7 +82,9 @@ function confirmedActionSchema() {
   });
 }
 
-export function createServer(): McpServer {
+export function createServer(dependencies: OpenCraftServerDependencies = {}): McpServer {
+  const getRuntime = dependencies.runtime ?? defaultRuntime;
+  const connect = dependencies.connect ?? connectOpenCraft;
   const server = new McpServer(
     {
       name: "opencraft",
@@ -79,7 +111,7 @@ export function createServer(): McpServer {
     },
     async (input) => {
       try {
-        return textResult(await connectOpenCraft(input));
+        return textResult(await connect(input));
       } catch (error) {
         return errorResult(error);
       }
@@ -95,7 +127,7 @@ export function createServer(): McpServer {
     },
     async () => {
       try {
-        const { config } = await runtime();
+        const { config } = await getRuntime();
         return textResult({ configured: true, ...publicConfig(config) });
       } catch (error) {
         return errorResult(error);
@@ -112,7 +144,7 @@ export function createServer(): McpServer {
     },
     async () => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         const [serverInfo, ram] = await Promise.all([client.getServer(serverId), client.getRam(serverId)]);
         return textResult({
           ...serverInfo,
@@ -134,7 +166,7 @@ export function createServer(): McpServer {
     },
     async () => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         const info = await client.getServer(serverId);
         return textResult(info.players);
       } catch (error) {
@@ -155,7 +187,7 @@ export function createServer(): McpServer {
     },
     async ({ motd, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `change the server MOTD to \"${motd}\"`);
         const result = await client.setMotd(serverId, motd);
@@ -175,7 +207,7 @@ export function createServer(): McpServer {
     },
     async ({ lines }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         const log = await client.getLogs(serverId);
         return textResult(log.content ? tailLog(log.content, lines) : "No server log is currently available.");
       } catch (error) {
@@ -193,7 +225,7 @@ export function createServer(): McpServer {
     },
     async ({ lines }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         const [info, log] = await Promise.all([client.getServer(serverId), client.getLogs(serverId)]);
         const content = log.content ? tailLog(log.content, lines) : "";
         const signals = diagnoseLog(content);
@@ -222,7 +254,7 @@ export function createServer(): McpServer {
       },
       async ({ confirmed }) => {
         try {
-          const { config, client, serverId } = await runtime();
+          const { config, client, serverId } = await getRuntime();
           requireWrites(config);
           requireConfirmation(confirmed, action);
           await client[verb](serverId);
@@ -243,7 +275,7 @@ export function createServer(): McpServer {
     },
     async ({ message }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         await client.runCommand(serverId, `say ${safeChatMessage(message)}`);
         return textResult({ sent: true, message });
@@ -267,7 +299,7 @@ export function createServer(): McpServer {
     },
     async ({ player, item, amount, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `give ${amount} ${item} to ${player}`);
         const target = minecraftName(player);
@@ -293,7 +325,7 @@ export function createServer(): McpServer {
     },
     async ({ player, destinationPlayer, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `teleport ${player} to ${destinationPlayer}`);
         const target = minecraftName(player);
@@ -319,7 +351,7 @@ export function createServer(): McpServer {
     },
     async ({ player, mode, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `set ${player}'s game mode to ${mode}`);
         const target = minecraftName(player);
@@ -343,7 +375,7 @@ export function createServer(): McpServer {
     },
     async ({ time, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `set the world time to ${time}`);
         await client.runCommand(serverId, `time set ${time}`);
@@ -367,7 +399,7 @@ export function createServer(): McpServer {
     },
     async ({ weather, durationSeconds, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `set the weather to ${weather}`);
         const command = `weather ${weather}${durationSeconds === undefined ? "" : ` ${durationSeconds}`}`;
@@ -386,13 +418,13 @@ export function createServer(): McpServer {
       description: "Change a named Minecraft game rule. Requires explicit confirmation.",
       inputSchema: z.object({
         rule: z.string().regex(/^[A-Za-z][A-Za-z0-9]{0,63}$/),
-        value: z.union([z.string().regex(/^[A-Za-z0-9_.+-]{1,64}$/), z.number().int()]),
+        value: z.union([z.string().regex(/^[A-Za-z0-9_.+-]{1,64}$/), z.number().int(), z.boolean()]),
         confirmed: z.boolean().default(false)
       })
     },
     async ({ rule, value, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `set gamerule ${rule} to ${value}`);
         await client.runCommand(serverId, `gamerule ${rule} ${value}`);
@@ -412,9 +444,9 @@ export function createServer(): McpServer {
     },
     async ({ command, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
-        requireConfirmation(confirmed, `run the raw console command \"${command.slice(0, 80)}\"`);
+        const { config, client, serverId } = await getRuntime();
         const validated = validateRawCommand(config, command);
+        requireConfirmation(confirmed, `run the raw console command \"${validated.slice(0, 80)}\"`);
         await client.runCommand(serverId, validated);
         return textResult({ accepted: true, command: validated });
       } catch (error) {
@@ -432,7 +464,7 @@ export function createServer(): McpServer {
     },
     async () => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         return textResult(await client.listPlayerLists(serverId));
       } catch (error) {
         return errorResult(error);
@@ -449,7 +481,7 @@ export function createServer(): McpServer {
     },
     async ({ list }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         return textResult({ list, entries: await client.getPlayerList(serverId, list) });
       } catch (error) {
         return errorResult(error);
@@ -471,7 +503,7 @@ export function createServer(): McpServer {
     },
     async ({ list, operation, entries, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `${operation} ${entries.join(", ")} ${operation === "add" ? "to" : "from"} ${list}`);
         const result = operation === "add"
@@ -493,7 +525,7 @@ export function createServer(): McpServer {
     },
     async ({ path }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         return textResult(await client.getFileInfo(serverId, path));
       } catch (error) {
         return errorResult(error);
@@ -510,7 +542,7 @@ export function createServer(): McpServer {
     },
     async ({ path, maxCharacters }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         const info = await client.getFileInfo(serverId, path);
         if (!info.isReadable || !info.isTextFile) throw new Error("Exaroton does not expose this path as a readable text file.");
         const content = await client.readFile(serverId, path);
@@ -530,7 +562,7 @@ export function createServer(): McpServer {
     },
     async ({ path }) => {
       try {
-        const { client, serverId } = await runtime();
+        const { client, serverId } = await getRuntime();
         return textResult({ path, options: await client.getConfig(serverId, path) });
       } catch (error) {
         return errorResult(error);
@@ -545,13 +577,14 @@ export function createServer(): McpServer {
       description: "Update typed options in an Exaroton-supported config file. Does not restart the server. Requires confirmation.",
       inputSchema: z.object({
         path: z.string().min(1).max(500).default("server.properties"),
-        changes: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])),
+        changes: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]))
+          .refine((value) => Object.keys(value).length > 0, "At least one config change is required."),
         confirmed: z.boolean().default(false)
       })
     },
     async ({ path, changes, confirmed }) => {
       try {
-        const { config, client, serverId } = await runtime();
+        const { config, client, serverId } = await getRuntime();
         requireWrites(config);
         requireConfirmation(confirmed, `update ${path} with ${Object.keys(changes).join(", ")}`);
         const before = await client.getConfig(serverId, path);
@@ -570,7 +603,7 @@ export function createServer(): McpServer {
 }
 
 export async function main(): Promise<void> {
-  await serveStdio(createServer);
+  await serveStdio(() => createServer());
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -44,5 +44,44 @@ describe("local configuration", () => {
     expect(JSON.parse(await readFile(getConfigPath(), "utf8"))).toEqual(config);
     await expect(loadConfig()).resolves.toEqual(config);
     expect(publicConfig(config)).not.toHaveProperty("apiToken");
+  });
+
+  it("migrates legacy configs that predate the raw-command preference", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "opencraft-legacy-config-test-"));
+    temporaryDirectories.push(directory);
+    process.env.OPENCRAFT_CONFIG_PATH = path.join(directory, "config.json");
+    delete process.env.EXAROTON_API_TOKEN;
+    delete process.env.EXAROTON_SERVER_ID;
+    await writeFile(process.env.OPENCRAFT_CONFIG_PATH, JSON.stringify({
+      version: 1,
+      apiToken: "legacy-token-that-is-long-enough",
+      serverId: "legacy-server",
+      serverName: "Legacy server",
+      safetyMode: "guarded",
+      createdAt: "2026-01-01T00:00:00.000Z"
+    }));
+
+    await expect(loadConfig()).resolves.toMatchObject({ allowRawCommands: true });
+  });
+
+  it("ignores blank environment overrides instead of breaking stored credentials", async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), "opencraft-empty-env-test-"));
+    temporaryDirectories.push(directory);
+    process.env.OPENCRAFT_CONFIG_PATH = path.join(directory, "config.json");
+    const config: OpenCraftConfig = {
+      version: 1,
+      apiToken: "stored-token-that-is-long-enough",
+      serverId: "stored-server",
+      serverName: "Stored server",
+      safetyMode: "guarded",
+      allowRawCommands: true,
+      createdAt: "2026-01-01T00:00:00.000Z"
+    };
+    await saveConfig(config);
+    process.env.EXAROTON_API_TOKEN = "   ";
+    process.env.EXAROTON_SERVER_ID = "";
+
+    await expect(loadConfig()).resolves.toEqual(config);
+    expect(publicConfig(config).credentialSource).toBe("local config");
   });
 });

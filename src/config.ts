@@ -10,7 +10,8 @@ const configSchema = z.object({
   serverId: z.string().min(1),
   serverName: z.string().min(1),
   safetyMode: z.enum(["read-only", "guarded"]),
-  allowRawCommands: z.boolean(),
+  // Keep configs created before raw commands became the guarded-mode default valid.
+  allowRawCommands: z.boolean().default(true),
   createdAt: z.string()
 });
 
@@ -33,6 +34,11 @@ function envSafetyMode(value: string | undefined): SafetyMode | undefined {
   return value === "read-only" || value === "guarded" ? value : undefined;
 }
 
+function nonEmptyEnvironmentValue(value: string | undefined): string | undefined {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
 export async function loadConfig(): Promise<OpenCraftConfig> {
   let stored: OpenCraftConfig | undefined;
   try {
@@ -47,8 +53,8 @@ export async function loadConfig(): Promise<OpenCraftConfig> {
     }
   }
 
-  const apiToken = process.env.EXAROTON_API_TOKEN ?? stored?.apiToken;
-  const serverId = process.env.EXAROTON_SERVER_ID ?? stored?.serverId;
+  const apiToken = nonEmptyEnvironmentValue(process.env.EXAROTON_API_TOKEN) ?? stored?.apiToken;
+  const serverId = nonEmptyEnvironmentValue(process.env.EXAROTON_SERVER_ID) ?? stored?.serverId;
   if (!apiToken || !serverId) {
     throw new OpenCraftConfigError(`OpenCraft is not configured. Paste the one-sentence setup request in chat or run \"opencraft setup\" in a local terminal.`);
   }
@@ -85,6 +91,6 @@ export function publicConfig(config: OpenCraftConfig) {
     serverName: config.serverName,
     safetyMode: config.safetyMode,
     allowRawCommands: config.allowRawCommands,
-    credentialSource: process.env.EXAROTON_API_TOKEN ? "environment" : "local config"
+    credentialSource: nonEmptyEnvironmentValue(process.env.EXAROTON_API_TOKEN) ? "environment" : "local config"
   };
 }
