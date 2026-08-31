@@ -144,6 +144,29 @@ export function createServer(): McpServer {
   );
 
   server.registerTool(
+    "minecraft_set_motd",
+    {
+      title: "Set server MOTD",
+      description: "Change the server-list message through Exaroton's dedicated MOTD option. Requires explicit confirmation.",
+      inputSchema: z.object({
+        motd: z.string().trim().min(1).max(160).refine((value) => !/[\r\n\0]/.test(value), "MOTD must be a single line."),
+        confirmed: z.boolean().default(false).describe("True only after the user explicitly confirms the MOTD change.")
+      })
+    },
+    async ({ motd, confirmed }) => {
+      try {
+        const { config, client, serverId } = await runtime();
+        requireWrites(config);
+        requireConfirmation(confirmed, `change the server MOTD to \"${motd}\"`);
+        const result = await client.setMotd(serverId, motd);
+        return textResult({ accepted: true, motd: result.motd, server: config.serverName });
+      } catch (error) {
+        return errorResult(error);
+      }
+    }
+  );
+
+  server.registerTool(
     "minecraft_read_logs",
     {
       title: "Read server logs",

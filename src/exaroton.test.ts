@@ -40,4 +40,24 @@ describe("ExarotonClient", () => {
     );
     expect(() => client.readFile("server", "../secret")).toThrow(/cannot contain/);
   });
+
+  it("updates the MOTD through its dedicated server option endpoint", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse({
+      success: true,
+      error: null,
+      data: { motd: "join or get slimed" }
+    }));
+    const client = new ExarotonClient("secret", "https://example.test/v1", fetcher);
+
+    await expect(client.setMotd("server/id", "join or get slimed")).resolves.toEqual({
+      motd: "join or get slimed"
+    });
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://example.test/v1/servers/server%2Fid/options/motd/",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ motd: "join or get slimed" })
+      })
+    );
+  });
 });

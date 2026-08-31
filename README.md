@@ -46,7 +46,7 @@ The AI calls `opencraft_connect`, so there is no terminal wizard and no follow-u
 
 ## What works
 
-- Server status, software, address, RAM, and online players
+- Server status, software, address, RAM, MOTD updates, and online players
 - Recent logs with control-code cleanup
 - Deterministic crash, mod, memory, authentication, and tick-lag signals
 - Start, stop, and restart with explicit confirmation

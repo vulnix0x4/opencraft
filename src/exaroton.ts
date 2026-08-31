@@ -120,6 +120,10 @@ export class ExarotonClient {
     return this.request("GET", `/servers/${encodeURIComponent(serverId)}/options/ram/`);
   }
 
+  setMotd(serverId: string, motd: string): Promise<{ motd: string }> {
+    return this.request("POST", `/servers/${encodeURIComponent(serverId)}/options/motd/`, { motd });
+  }
+
   start(serverId: string): Promise<unknown> {
     return this.request("GET", `/servers/${encodeURIComponent(serverId)}/start/`);
   }
