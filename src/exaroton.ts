@@ -34,7 +34,7 @@ export class ExarotonClient {
     private readonly fetcher: typeof fetch = fetch
   ) {}
 
-  private async request<T>(method: string, endpoint: string, body?: unknown): Promise<T> {
+  private async request<T>(method: string, endpoint: string, body?: unknown, allowNullData = false): Promise<T> {
     let response: Response;
     try {
       response = await this.fetcher(`${this.apiBase}${endpoint}`, {
@@ -61,13 +61,13 @@ export class ExarotonClient {
       throw new ExarotonApiError(`Exaroton returned an unreadable response (HTTP ${response.status}).`, response.status);
     }
 
-    if (!response.ok || !envelope.success || envelope.data === null) {
+    if (!response.ok || !envelope.success || (!allowNullData && envelope.data === null)) {
       const fallback = response.status === 401 || response.status === 403
         ? "The Exaroton credential was rejected. Run \"opencraft setup\" with a fresh token."
         : `Exaroton request failed (HTTP ${response.status}).`;
       throw new ExarotonApiError(envelope.error || fallback, response.status);
     }
-    return envelope.data;
+    return envelope.data as T;
   }
 
   private async requestText(endpoint: string): Promise<string> {
@@ -125,19 +125,19 @@ export class ExarotonClient {
   }
 
   start(serverId: string): Promise<unknown> {
-    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/start/`);
+    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/start/`, undefined, true);
   }
 
   stop(serverId: string): Promise<unknown> {
-    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/stop/`);
+    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/stop/`, undefined, true);
   }
 
   restart(serverId: string): Promise<unknown> {
-    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/restart/`);
+    return this.request("GET", `/servers/${encodeURIComponent(serverId)}/restart/`, undefined, true);
   }
 
   runCommand(serverId: string, command: string): Promise<unknown> {
-    return this.request("POST", `/servers/${encodeURIComponent(serverId)}/command/`, { command });
+    return this.request("POST", `/servers/${encodeURIComponent(serverId)}/command/`, { command }, true);
   }
 
   listPlayerLists(serverId: string): Promise<string[]> {

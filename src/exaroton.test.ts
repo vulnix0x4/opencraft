@@ -60,4 +60,22 @@ describe("ExarotonClient", () => {
       })
     );
   });
+
+  it("accepts null data from successful action endpoints", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse({
+      success: true,
+      error: null,
+      data: null
+    }));
+    const client = new ExarotonClient("secret", "https://example.test/v1", fetcher);
+
+    await expect(client.runCommand("server", "say locked in")).resolves.toBeNull();
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://example.test/v1/servers/server/command/",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ command: "say locked in" })
+      })
+    );
+  });
 });
