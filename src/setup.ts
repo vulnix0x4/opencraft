@@ -59,7 +59,7 @@ export async function connectOpenCraft(
     serverId: selected.id,
     serverName: selected.name,
     safetyMode,
-    allowRawCommands: safetyMode === "guarded" && (input.allowRawCommands ?? false),
+    allowRawCommands: safetyMode === "guarded" && (input.allowRawCommands ?? true),
     createdAt: (dependencies.now?.() ?? new Date()).toISOString()
   };
   const configPath = await persist(config);

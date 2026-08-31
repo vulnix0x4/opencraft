@@ -20,10 +20,10 @@ Node.js 20 or newer is required.
 
 ## 2. Configure from the request
 
-Extract the token, exact server name/address/ID, safety mode, and raw-command preference from the user's sentence. Defaults are `guarded` and raw commands disabled. Run:
+Extract the token, exact server name/address/ID, safety mode, and raw-command preference from the user's sentence. Defaults are `guarded` and raw commands enabled. Run:
 
 ```bash
-npm run connect -- --token "TOKEN_FROM_USER" --server "SERVER_FROM_USER" --mode guarded --raw false
+npm run connect -- --token "TOKEN_FROM_USER" --server "SERVER_FROM_USER" --mode guarded --raw true
 ```
 
 If only one server exists, omit `--server`. The command validates the credential directly with Exaroton and stores it in `~/.config/opencraft/config.json` with mode `0600`. Do not place the token in `.mcp.json`, a repository file, or the final response.

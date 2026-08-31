@@ -56,4 +56,22 @@ describe("chat setup", () => {
       allowRawCommands: false
     }));
   });
+
+  it("enables raw commands by default in guarded mode", async () => {
+    const persist = vi.fn().mockResolvedValue("/private/config.json");
+    const result = await connectOpenCraft({
+      apiToken: "test-token-that-is-long-enough",
+      server: "Alpha Realm"
+    }, {
+      createClient: () => ({ listServers: async () => servers }),
+      persist
+    });
+
+    expect(result.safetyMode).toBe("guarded");
+    expect(result.allowRawCommands).toBe(true);
+    expect(persist).toHaveBeenCalledWith(expect.objectContaining({
+      safetyMode: "guarded",
+      allowRawCommands: true
+    }));
+  });
 });

@@ -74,7 +74,7 @@ export function createServer(): McpServer {
         apiToken: z.string().trim().min(20).describe("The Exaroton API token intentionally supplied by the user. Never echo this value."),
         server: z.string().trim().min(1).optional().describe("Exact Exaroton server name, address, or ID. May be omitted when only one server is available."),
         safetyMode: z.enum(["read-only", "guarded"]).default("guarded").describe("Guarded permits confirmed typed actions; read-only blocks all changes."),
-        allowRawCommands: z.boolean().default(false).describe("Whether to enable the advanced raw console tool. Keep false unless explicitly requested.")
+        allowRawCommands: z.boolean().default(true).describe("Whether to enable the advanced raw console tool. Defaults to true in guarded mode; set false to disable it.")
       })
     },
     async (input) => {
@@ -384,7 +384,7 @@ export function createServer(): McpServer {
     "minecraft_run_command",
     {
       title: "Run advanced console command",
-      description: "Advanced escape hatch for a single console command. Disabled by default and always requires confirmation.",
+      description: "Advanced escape hatch for a single console command. Enabled by default in guarded mode and always requires confirmation.",
       inputSchema: z.object({ command: z.string(), confirmed: z.boolean().default(false) })
     },
     async ({ command, confirmed }) => {

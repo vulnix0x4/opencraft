@@ -23,7 +23,7 @@ AI:    Done — Exaroton accepted 32 minecraft:firework_rocket for Luke.
 Copy this sentence into Codex or Claude Code, replacing the two placeholders:
 
 ```text
-Install OpenCraft from https://github.com/vulnix0x4/opencraft, add it to this AI client as a local MCP server, and configure my Exaroton server named SERVER_NAME using API token EXAROTON_API_TOKEN in guarded mode with raw commands disabled.
+Install OpenCraft from https://github.com/vulnix0x4/opencraft, add it to this AI client as a local MCP server, and configure my Exaroton server named SERVER_NAME using API token EXAROTON_API_TOKEN in guarded mode with raw commands enabled.
 ```
 
 That is the whole user-facing setup. The coding agent should clone the repository, run `npm install` and `npm run build`, register `.mcp.json` with the client, and configure OpenCraft non-interactively with:
@@ -31,7 +31,7 @@ That is the whole user-facing setup. The coding agent should clone the repositor
 The repository includes [INSTALL_FOR_AI.md](INSTALL_FOR_AI.md), a deterministic install runbook for the agent to follow on Codex or Claude Code.
 
 ```bash
-npm run connect -- --token "EXAROTON_API_TOKEN" --server "SERVER_NAME" --mode guarded --raw false
+npm run connect -- --token "EXAROTON_API_TOKEN" --server "SERVER_NAME" --mode guarded --raw true
 ```
 
 The token is verified directly against Exaroton, written to `~/.config/opencraft/config.json` with owner-only permissions, and omitted from all OpenCraft responses. Some MCP clients require one restart or reconnect after installing a new local server; configuration itself still happens from the original chat request.
@@ -39,7 +39,7 @@ The token is verified directly against Exaroton, written to `~/.config/opencraft
 Once OpenCraft is already installed, setup is even shorter:
 
 ```text
-Set up OpenCraft with Exaroton API token EXAROTON_API_TOKEN for server SERVER_NAME in guarded mode with raw commands disabled.
+Set up OpenCraft with Exaroton API token EXAROTON_API_TOKEN for server SERVER_NAME in guarded mode with raw commands enabled.
 ```
 
 The AI calls `opencraft_connect`, so there is no terminal wizard and no follow-up questionnaire. If the account has exactly one server, `SERVER_NAME` can be omitted.
@@ -53,7 +53,7 @@ The AI calls `opencraft_connect`, so there is no terminal wizard and no follow-u
 - Typed item grants, teleports, game modes, time, weather, game rules, and broadcasts
 - Whitelist, operator, and ban-list inspection and updates
 - Safe file metadata, text-file reads, and typed configuration updates
-- Optional raw console escape hatch, disabled by default
+- Raw console escape hatch, enabled by default in guarded mode
 
 ## Manual setup
 
@@ -76,7 +76,7 @@ npm test
 
 ## Safety model
 
-OpenCraft is guarded by default. Every input is schema-validated, Minecraft names and resource IDs are constrained, high-impact actions require explicit confirmation, and raw commands are both opt-in and filtered. Read-only mode disables every mutation.
+OpenCraft is guarded by default. Every input is schema-validated, Minecraft names and resource IDs are constrained, high-impact actions require explicit confirmation, and raw commands are enabled by default but still confirmed and filtered. Read-only mode disables every mutation.
 
 Starting a server can consume Exaroton credits. Restarting or stopping disconnects players. OpenCraft calls those effects out before acting.
 

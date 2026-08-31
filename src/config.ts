@@ -59,7 +59,7 @@ export async function loadConfig(): Promise<OpenCraftConfig> {
     serverId,
     serverName: stored?.serverName ?? serverId,
     safetyMode: envSafetyMode(process.env.OPENCRAFT_SAFETY_MODE) ?? stored?.safetyMode ?? "guarded",
-    allowRawCommands: stored?.allowRawCommands ?? false,
+    allowRawCommands: stored?.allowRawCommands ?? true,
     createdAt: stored?.createdAt ?? new Date().toISOString()
   };
 }

@@ -24,7 +24,7 @@ Keep cuts tight. The setup sentence is the hook; compress the package-install wa
 
 Suggested follow-up:
 
-> v1 has 20+ MCP tools, one-sentence setup, read-only/guarded modes, deterministic crash signals, config inspection, and a raw-command escape hatch that is disabled by default. Built in TypeScript against Exaroton’s API.
+> v1 has 20+ MCP tools, one-sentence setup, read-only/guarded modes, deterministic crash signals, config inspection, and a raw-command escape hatch that is enabled by default in guarded mode. Built in TypeScript against Exaroton’s API.
 
 ## Demo prompts
 

@@ -75,7 +75,7 @@ async function setup(): Promise<void> {
   const allowRawCommands = safetyMode === "guarded"
     ? await confirm({
       message: "Enable the advanced raw-console-command tool?",
-      default: false
+      default: true
     })
     : false;
 
@@ -123,7 +123,7 @@ async function connect(): Promise<void> {
   if (mode !== "guarded" && mode !== "read-only") {
     throw new Error("--mode must be guarded or read-only.");
   }
-  const raw = option("--raw") ?? "false";
+  const raw = option("--raw") ?? "true";
   if (raw !== "true" && raw !== "false") throw new Error("--raw must be true or false.");
 
   const result = await connectOpenCraft({
