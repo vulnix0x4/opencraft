@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/vulnix0x4/opencraft/actions/workflows/ci.yml/badge.svg)](https://github.com/vulnix0x4/opencraft/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-69F0AE.svg)](LICENSE)
 
-OpenCraft is an open-source AI server admin for Minecraft, powered by the Exaroton API. It gives Codex, Claude Code, and other local MCP clients typed tools for status, logs, crash diagnosis, players, configuration, and guarded server actions.
+OpenCraft is an open-source AI co-admin for Minecraft, powered by the Exaroton API. It gives Codex, Claude Code, and other local MCP clients typed tools plus a guarded raw-command fallback for status, logs, crash diagnosis, players, configuration, and server actions.
 
 ```text
 You:   Why did the server crash?
@@ -43,6 +43,18 @@ Set up OpenCraft with Exaroton API token EXAROTON_API_TOKEN for server SERVER_NA
 ```
 
 The AI calls `opencraft_connect`, so there is no terminal wizard and no follow-up questionnaire. If the account has exactly one server, `SERVER_NAME` can be omitted.
+
+## Companion behavior
+
+OpenCraft is designed to feel like a locked-in server teammate, not a manual with a chat box. The AI should:
+
+- Inspect the server and infer names, versions, context, and command syntax itself
+- Use typed tools for common actions and raw commands for custom, modded, or advanced requests
+- Keep answers short, casual, useful, and a little playful
+- Skip process narration and avoid asking for information it can inspect
+- Ask only the confirmation required before a real server change, in one direct sentence
+
+You can ask naturally: `give x a stupidly overpowered sword`. The AI should determine the right command for the installed Minecraft version, explain the exact effect briefly, ask for confirmation, and run it after approval.
 
 ## What works
 

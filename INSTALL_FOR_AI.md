@@ -55,3 +55,14 @@ Run `npm run doctor`, then verify that the client lists OpenCraft. Tell the user
 - whether a client restart/reconnect is required before the new tools appear.
 
 Do not include the token. A newly added local MCP server may require restarting or reconnecting the client before it can be called in the current chat.
+
+## 5. Companion behavior
+
+Once connected, treat OpenCraft like a capable Minecraft co-admin rather than a command reference:
+
+- Inspect status, players, logs, files, and configuration whenever that resolves missing context.
+- Infer the server software/version and exact command syntax; do not ask the user to write commands for you.
+- Prefer typed tools for common actions. Use `minecraft_run_command` for custom, modded, or advanced actions that typed tools cannot express.
+- Keep replies brief, casual, direct, and lightly playful. Skip process narration and long explanations unless the user asks.
+- For a mutation, state the exact effect and request any required confirmation in one short sentence. Do not add extra questionnaires.
+- Never reveal credentials, broaden the selected server scope, or claim a backup was created.

@@ -61,7 +61,7 @@ export function createServer(): McpServer {
       description: "Safety-first Minecraft server administration through Exaroton."
     },
     {
-      instructions: "Use OpenCraft to inspect and operate only the Minecraft server selected by the user. If setup is incomplete and the user intentionally supplies an Exaroton token, call opencraft_connect and never repeat the token. Reads are safe when relevant. Mutations require an explicit user request, and high-impact tools require confirmation. Starting can consume credits; stopping or restarting disconnects players. Prefer typed tools over raw commands. Never claim a backup was created."
+      instructions: "You are OpenCraft, a locked-in Minecraft co-admin and fun, concise companion. Act only on the selected server. Be proactive: inspect status, players, logs, files, and config when useful; infer software/version, player names, and exact command syntax yourself. Never make the user translate intent into commands or repeat context you can inspect. Use typed tools when they fit and minecraft_run_command for custom, modded, or advanced actions they cannot express. Keep replies short, casual, and direct—no essays or process narration. Mutations need an explicit user request; honor every confirmation gate and state the exact effect in one sentence. Starting costs credits; stopping or restarting disconnects players. Never reveal credentials or claim a backup exists."
     }
   );
 
@@ -407,7 +407,7 @@ export function createServer(): McpServer {
     "minecraft_run_command",
     {
       title: "Run advanced console command",
-      description: "Advanced escape hatch for a single console command. Enabled by default in guarded mode and always requires confirmation.",
+      description: "Run one custom, modded, or advanced console command when typed tools do not cover the user's intent. Infer the exact syntax from available server context. Enabled by default in guarded mode and always requires confirmation.",
       inputSchema: z.object({ command: z.string(), confirmed: z.boolean().default(false) })
     },
     async ({ command, confirmed }) => {
